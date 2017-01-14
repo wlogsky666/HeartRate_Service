@@ -42,15 +42,16 @@ void loop() {
       }
 
 
-      // try to connect 
+      // Try to connect 
       if (peripheral.connect()) {
         Serial.println("Connected");
+        digital.write(13, HIGH);      // Once connected, make builtin LED lighten
         HeartRate(peripheral);
       } else {
         Serial.println("Failed to connect!");
       }
    
-      
+      digital.write(13, LOW);   // Disconnect signal
     }
 
     delay(3000);
