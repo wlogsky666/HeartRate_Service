@@ -79,8 +79,41 @@ void HeartRate(BLEDevice peripheral) {
     return;
   }
 
-  delay(2000);
+  heartrate = peripheral.characteristic("2A37");
+  battery   = peripheral.characteristic("2A19");
+
+  if( !heartrate || !battert ) return ;   // Service not exist
+
+  if( !heartrate.subscribe() || !battery.subscribe() ) return ;   // Cannot subscribe
+
+  while( peripheral.conneted() ){
+
+    if( battery.valueUpdated() )
+    {
+      Serial.print("Battery : ");
+      printData(battery.value(), battery.valueLength());
+      Serial.println(" %");
+    }
+    if( heartrate.valueUpdated() )
+    {
+      Serial.print("Heartrate : ");
+      printData(heartrate.value(), heartrate.valueLength());
+      Serial.println(" bpm");
+    }
+
+  }
+
 }
 
+void printData(const unsigned char data[], int length) {
+  for (int i = 0; i < length; i++) {
+    unsigned char b = data[i];
 
+    if (b < 16) {
+      Serial.print("0");
+    }
+
+    Serial.print(b);
+  }
+}
 
