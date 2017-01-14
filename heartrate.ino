@@ -1,17 +1,7 @@
 #include <CurieBLE.h>
 
-BLEPeripheral blePeripheral;       // BLE Peripheral Device (the board you're programming)
 BLEService heartRateService("180D"); // BLE Heart Rate Service
 BLEService batteryService("180F"); // BLE Battery Service
-
-// BLE Heart Rate Measurement Characteristic"
-BLECharacteristic heartRateChar("2A37",  // standard 16-bit characteristic UUID
-    BLERead | BLENotify, 2);  // remote clients will be able to get notifications if this characteristic changes
-BLECharacteristic batteryLevelChar("2A19",  // standard 16-bit characteristic UUID
-    BLERead | BLENotify, 2 );  // detect battery level
-
-const char localName[30] = "HeartRate_Arduino101" ;
-int i = 0 ;
 
 void setup() {
   Serial.begin(9600);
@@ -62,9 +52,7 @@ void loop() {
    
       
     }
-    if(i) digitalWrite(13, LOW);
-    else digitalWrite(13, HIGH);
-    i = 1-i;
+
     delay(3000);
 }
 
@@ -79,8 +67,8 @@ void HeartRate(BLEDevice peripheral) {
     return;
   }
 
-  heartrate = peripheral.characteristic("2A37");
-  battery   = peripheral.characteristic("2A19");
+  heartrate = peripheral.characteristic("2A37");  // UUID of heartrate service is 2A37
+  battery   = peripheral.characteristic("2A19");  // UUID of battery service is 2A19
 
   if( !heartrate || !battert ) return ;   // Service not exist
 
