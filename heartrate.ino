@@ -45,13 +45,13 @@ void loop() {
       // Try to connect 
       if (peripheral.connect()) {
         Serial.println("Connected");
-        digital.write(13, HIGH);      // Once connected, make builtin LED lighten
+        digitalWrite(13, HIGH);      // Once connected, make builtin LED lighten
         HeartRate(peripheral);
       } else {
         Serial.println("Failed to connect!");
       }
    
-      digital.write(13, LOW);   // Disconnect signal
+      digitalWrite(13, LOW);   // Disconnect signal
     }
 
     delay(3000);
@@ -68,14 +68,14 @@ void HeartRate(BLEDevice peripheral) {
     return;
   }
 
-  heartrate = peripheral.characteristic("2A37");  // UUID of heartrate service is 2A37
-  battery   = peripheral.characteristic("2A19");  // UUID of battery service is 2A19
+  BLECharacteristic heartrate = peripheral.characteristic("2A37");  // UUID of heartrate service is 2A37
+  BLECharacteristic battery   = peripheral.characteristic("2A19");  // UUID of battery service is 2A19
 
-  if( !heartrate || !battert ) return ;   // Service not exist
+  if( !heartrate || !battery ) return ;   // Service not exist
 
   if( !heartrate.subscribe() || !battery.subscribe() ) return ;   // Cannot subscribe
 
-  while( peripheral.conneted() ){
+  while( peripheral.connected() ){
 
     if( battery.valueUpdated() )
     {
@@ -89,9 +89,8 @@ void HeartRate(BLEDevice peripheral) {
       printData(heartrate.value(), heartrate.valueLength());
       Serial.println(" bpm");
     }
-
+    
   }
-
 }
 
 void printData(const unsigned char data[], int length) {
