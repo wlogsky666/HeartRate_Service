@@ -81,21 +81,22 @@ void HeartRate(BLEDevice peripheral) {
       return ;
   }
 
-  if( !heartrate.subscribe() || !battery.subscribe() )
+  if( !heartrate.subscribe() )
   {
       Serial.println("Cannot Subscribe HeartRate or Battery Service...");
       return ;
   }
+  
 
   while( peripheral.connected() ){
 
-      timer ++ ;
-      if(  battery.valueUpdated() )
+      timer ++;
+      if( timer > 1000000 && battery.read() && battery.valueUpdated() )
       {
           timer = 0;
           Serial.print("Battery : ");
           printData(battery.value(), battery.valueLength());
-          Serial.println(" %");
+          Serial.println("%");
       }
       if( heartrate.valueUpdated() )
       {
@@ -116,6 +117,5 @@ void printData(const unsigned char data[], int length) {
     }
 
     Serial.print(b);
-    Serial.print(' ');
   }
 }
