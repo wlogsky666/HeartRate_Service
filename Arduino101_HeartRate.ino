@@ -5,11 +5,10 @@ BLEService batteryService("180F"); // BLE Battery Service
 
 void setup() {
   Serial.begin(9600);
-  while(!Serial.available()) ;
   pinMode(13, OUTPUT);   // indicate when a central is connected
+  delay(10000);
 
   BLE.begin();
-  
   Serial.println("BLE Central begin ...");
   Serial.println("Make sure to turn on the device.");
   
@@ -50,20 +49,25 @@ void loop() {
       } else {
         Serial.println("Failed to connect!");
       }
-   
+      
+      Serial.println("Disconnect");
       digitalWrite(13, LOW);   // Disconnect signal
     }
 
     delay(3000);
 }
-
+int timer = 0 ;
 void HeartRate(BLEDevice peripheral) {
 
-  Serial.println("Discovering attributes ...");     // Get attributes
-  if (peripheral.discoverAttributes()) {
-    Serial.println("Attributes discovered");
-  } else {
-    Serial.println("Attribute discovery failed!");
+  // discover peripheral attributes
+  Serial.println("Discovering attributes of service 0x180D ...");
+  if (peripheral.discoverAttributesByService("180D")) {
+      Serial.println("Attributes discovered");
+      if(!peripheral.discoverAttributesByService("180F"))
+          Serial.println("Battery Attributes not discoverd");
+  } 
+  else {
+    Serial.println("Attribute discovery failed.");
     peripheral.disconnect();
     return;
   }
@@ -71,24 +75,34 @@ void HeartRate(BLEDevice peripheral) {
   BLECharacteristic heartrate = peripheral.characteristic("2A37");  // UUID of heartrate service is 2A37
   BLECharacteristic battery   = peripheral.characteristic("2A19");  // UUID of battery service is 2A19
 
-  if( !heartrate || !battery ) return ;   // Service not exist
+  if( !heartrate || !battery )   // Service not exist
+  {
+      Serial.println("No HeartRate or Battery Service...");  
+      return ;
+  }
 
-  if( !heartrate.subscribe() || !battery.subscribe() ) return ;   // Cannot subscribe
+  if( !heartrate.subscribe() || !battery.subscribe() )
+  {
+      Serial.println("Cannot Subscribe HeartRate or Battery Service...");
+      return ;
+  }
 
   while( peripheral.connected() ){
 
-    if( battery.valueUpdated() )
-    {
-      Serial.print("Battery : ");
-      printData(battery.value(), battery.valueLength());
-      Serial.println(" %");
-    }
-    if( heartrate.valueUpdated() )
-    {
-      Serial.print("Heartrate : ");
-      printData(heartrate.value(), heartrate.valueLength());
-      Serial.println(" bpm");
-    }
+      timer ++ ;
+      if(  battery.valueUpdated() )
+      {
+          timer = 0;
+          Serial.print("Battery : ");
+          printData(battery.value(), battery.valueLength());
+          Serial.println(" %");
+      }
+      if( heartrate.valueUpdated() )
+      {
+          Serial.print("Heartrate : ");
+          Serial.print((int)((char*)heartrate.value())[1]);
+          Serial.println(" bpm");
+      }
     
   }
 }
@@ -102,6 +116,6 @@ void printData(const unsigned char data[], int length) {
     }
 
     Serial.print(b);
+    Serial.print(' ');
   }
 }
-
