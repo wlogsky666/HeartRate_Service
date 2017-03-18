@@ -105,7 +105,12 @@ void HeartRate(BLEDevice peripheral) {
           Serial.print((int)((char*)heartrate.value())[1]);
           Serial.println(" bpm");
       }
-    
+      Serial.print("Acce : ");
+      float x, y, z;
+      readAcce(x, y, z);
+      char buf[30];
+      sprintf(buf, "%f %f %f\n", x, y, z);
+      Serial.println(buf);
   }
 }
 
@@ -121,7 +126,7 @@ void printData(const unsigned char data[], int length) {
   }
 }
 
-void readAcce(int& ax, int&ay, int& az)
+void readAcce(float& ax, float&ay, float& az)
 {
     int axRaw, ayRaw, azRaw;
 
