@@ -1,12 +1,15 @@
 #include <CurieBLE.h>
-
-BLEService heartRateService("180D"); // BLE Heart Rate Service
-BLEService batteryService("180F"); // BLE Battery Service
+#include <CurieIMU.h>
 
 void setup() {
   Serial.begin(9600);
   pinMode(13, OUTPUT);   // indicate when a central is connected
   delay(10000);
+
+  CurieIMU.begin();
+  Serial.println("Initializing IMU device...");
+  // Set the accelerometer range to 2G
+  CurieIMU.setAccelerometerRange(2);
 
   BLE.begin();
   Serial.println("BLE Central begin ...");
@@ -75,14 +78,12 @@ void HeartRate(BLEDevice peripheral) {
   BLECharacteristic heartrate = peripheral.characteristic("2A37");  // UUID of heartrate service is 2A37
   BLECharacteristic battery   = peripheral.characteristic("2A19");  // UUID of battery service is 2A19
 
-  if( !heartrate || !battery )   // Service not exist
-  {
+  if( !heartrate || !battery ){   // Service not exist
       Serial.println("No HeartRate or Battery Service...");  
       return ;
   }
 
-  if( !heartrate.subscribe() )
-  {
+  if( !heartrate.subscribe() ){
       Serial.println("Cannot Subscribe HeartRate or Battery Service...");
       return ;
   }
@@ -118,4 +119,20 @@ void printData(const unsigned char data[], int length) {
 
     Serial.print(b);
   }
+}
+
+void readAcce(int& ax, int&ay, int& az)
+{
+    int axRaw, ayRaw, azRaw;
+
+    // read raw accelerometer measurements from device
+    CurieIMU.readAccelerometer(axRaw, ayRaw, azRaw);
+
+    // convert the raw accelerometer data to G's
+    ax = (axRaw*2.0) / 32768.0;
+    ay = (ayRaw*2.0) / 32768.0;
+    az = (azRaw*2.0) / 32768.0;
+
+//     float theta = atan( sqrt(ax*ax+ay*ay)/az )*180/PI ;
+//     return theta ;
 }
