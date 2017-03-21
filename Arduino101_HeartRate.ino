@@ -78,8 +78,8 @@ void HeartRate(BLEDevice peripheral) {
   BLECharacteristic heartrate = peripheral.characteristic("2A37");  // UUID of heartrate service is 2A37
   BLECharacteristic battery   = peripheral.characteristic("2A19");  // UUID of battery service is 2A19
 
-  if( !heartrate || !battery ){   // Service not exist
-      Serial.println("No HeartRate or Battery Service...");  
+  if( !heartrate ){   // Service not exist
+      Serial.println("No HeartRate Service...");  
       return ;
   }
 
