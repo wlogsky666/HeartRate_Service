@@ -85,7 +85,7 @@ void heartrate_service(){
               Serial.println();
               delay(5000) ;
           }
-   
+          // queryNotification() is unusable
           if( client.queryNotification(heartrateServiceUUID, true, heartrateCharUUID, attrValue))
           {
               for( int i = 0; i < attrValue.len; ++i)
