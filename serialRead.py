@@ -16,9 +16,7 @@ with serial.Serial('/dev/ttyACM0', 9600, timeout=2) as s:
 		time += 1
 
 		if line.startswith('Heartrate : '):
-			line = line[len('Heartrate : '):]
-
-			h = float(line.split(' ')[0])
+			h = float(line[len('Heartrate : '):].split(' ')[0])
 			if lastH != 0 :
 				plt.plot([lasttimeH, time], [lastH, h], color='r')
 				print([lasttimeH, time], [lastH, h])
